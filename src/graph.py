@@ -2,104 +2,85 @@ from PIL import Image
 import networkx as nx
 from collections import deque
 
-def process_image(file_path):
-    try:
-        img = Image.open(file_path)
-        
-        print("Image size: ", img.size)
-        print("Image format: ", img.format)
-        print("Image mode: ", img.mode)
+class ImageGraph:
+    def __init__(self):
+        self.image = None
+        self.width = 0
+        self.height = 0
+        self.graph = nx.Graph()
+        self.equipment = None
+        self.maintenance_area = None
 
+    def process_image(self, file_path):
+        try:
+            self.image = Image.open(file_path).convert('RGB')
+            self.width, self.height = self.image.size
+        except FileNotFoundError:
+            print("File not found")
 
-    except FileNotFoundError:
-        print("File not found")
+    def build_graph(self):
+        if self.image is not None:
+            for x in range(self.width):
+                for y in range(self.height):
+                    pixel = self.image.getpixel((x, y))
 
-caminho_imagem = 'c:/Users/Samuell/Desktop/AEDS III/Trabalho/src/toy.bmp'
-process_image(caminho_imagem)
-print(" ")
+                    if pixel == (255, 0, 0):  # Pixel vermelho (equipamento)
+                        self.equipment = (x, y)
+                    elif pixel == (0, 255, 0):  # Pixel verde (área de manutenção)
+                        self.maintenance_area = (x, y)
 
-def criar_grafo(imagem):
+                    if pixel != (0, 0, 0):  # Ignorar pixels pretos
+                        self.graph.add_node((x, y))
 
-    img = Image.open(imagem).convert('1')
+                        for dx in [-1, 0, 1]:
+                            for dy in [-1, 0, 1]:
+                                nx_val = x + dx
+                                ny_val = y + dy
 
-    grafo = nx.Graph()
+                                if 0 <= nx_val < self.width and 0 <= ny_val < self.height:
+                                    neighbor_pixel = self.image.getpixel((nx_val, ny_val))
 
-    largura, altura = img.size
+                                    if neighbor_pixel != (0, 0, 0):
+                                        self.graph.add_edge((x, y), (nx_val, ny_val))
 
-    for x in range(largura):
-        for y in range(altura):
-            pixel = img.getpixel((x, y))
+    def find_path(self):
+        queue = deque([(self.equipment, [])])  # Inicializa fila com tupla contendo ponto atual e caminho percorrido
+        visited = set()
+        directions = {
+            (-1, 0): '↑', (1, 0): '↓', (0, -1): '←', (0, 1): '→'
+        }
 
-            if pixel != 0:
-                grafo.add_node((x, y))
+        while queue:
+            (current_point, path) = queue.popleft()
+            if current_point == self.maintenance_area:
+                return ' '.join(path)  # Retorna o caminho encontrado
 
-                for dx in [-1, 0, 1]:
-                    for dy in [-1, 0, 1]:
-                        if dx == 0 and dy == 0:
-                            continue
+            if current_point not in visited:
+                visited.add(current_point)
 
-                    nx_val = x + dx
-                    ny_val = y + dy
+                for dx, dy in directions:
+                    nx_val = current_point[0] + dx
+                    ny_val = current_point[1] + dy
 
-                    if 0 <= nx_val < largura and 0 <= ny_val < altura:
-                        neighbor_pixel = img.getpixel((nx_val, ny_val))
+                    if (nx_val, ny_val) in self.graph[current_point]:
+                        new_point = (nx_val, ny_val)
+                        new_path = path + [directions[(dx, dy)]]
+                        queue.append((new_point, new_path))
 
-                        if neighbor_pixel != 0:
-                            grafo.add_edge((x, y), (nx_val, ny_val))
-    return grafo
+        return None
 
-caminho_imagem = 'c:/Users/Samuell/Desktop/AEDS III/Trabalho/src/toy.bmp'
+def main():
+    caminho_imagem = 'toy.bmp'
 
-grafo = criar_grafo(caminho_imagem)
+    image_graph = ImageGraph()
+    image_graph.process_image(caminho_imagem)
+    image_graph.build_graph()
 
-num_nos = grafo.number_of_nodes()
-num_arestas = grafo.number_of_edges()
-
-print("Número de nós: ", num_nos)
-print("Número de arestas: ", num_arestas)
-print(" ")
-
-def encontrar_caminho(grafo, inicio, fim):
-    fila = deque([(inicio, [inicio])])
-    visitados = set()
-
-    while fila:
-        atual, caminho = fila.popleft()
-
-        if atual == fim:
-            return caminho
-        
-        visitados.add(atual)
-        vizinhos = list(grafo.neighbors(atual))
-        for vizinho in vizinhos:
-            if vizinho not in visitados:
-                novo_caminho = caminho + [vizinho]
-                fila.append((vizinho, novo_caminho))
-    
-    return None
-
-
-caminho_imagem = 'c:/Users/Samuell/Desktop/AEDS III/Trabalho/src/toy.bmp'
-img = Image.open(caminho_imagem)
-
-equipamento = None
-area_manuntecao = None
-for node in grafo.nodes():
-    pixel = img.getpixel(node)
-    if pixel == (255, 0, 0):
-        equipamento = node
-    if pixel == (0, 255, 0):
-        area_manuntecao = node
-
-if equipamento and area_manuntecao:
-    try:
-        sequencia_passos = nx.shortest_path(grafo, equipamento, area_manuntecao)
-        print("Sequência de passos: ")
-        for passo in sequencia_passos:
-            print(passo)
-    except nx.NetworkXNoPath:
+    path = image_graph.find_path()
+    if path:
+        print("Caminho encontrado:", path)
+    else:
         print("Não foi possível encontrar um caminho")
-else:
-    print("Não foi possível encontrar um caminho")
 
-    
+if __name__ == "__main__":
+    main()
