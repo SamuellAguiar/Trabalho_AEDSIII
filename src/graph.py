@@ -1,86 +1,84 @@
-from PIL import Image
-import networkx as nx
 from collections import deque
+from PIL import Image
+from matplotlib import pyplot as plt
+import networkx as nx
 
 class ImageGraph:
-    def __init__(self):
-        self.image = None
-        self.width = 0
-        self.height = 0
-        self.graph = nx.Graph()
-        self.equipment = None
-        self.maintenance_area = None
+    def __init__(self, image_path):
+        self.image = Image.open(image_path)
+        self.width, self.height = self.image.size
+        self.graph = {}
+        self.visited = {}
+        
 
-    def process_image(self, file_path):
-        try:
-            self.image = Image.open(file_path).convert('RGB')
-            self.width, self.height = self.image.size
-        except FileNotFoundError:
-            print("File not found")
+    def visualize_graph(self):
+        G = nx.Graph()
+        for node, edges in self.graph.items():
+            for edge in edges:
+                G.add_edge(node, edge)
 
+        pos = {node: (node[0], -node[1]) for node in G.nodes()}  # Flip the y-axis to match image coordinates
+        nx.draw(G, pos, with_labels=False, node_size=10)
+        plt.show()
+    
+
+    def get_red_pixels(self):
+        red_pixels = []
+        for x in range(self.width):
+            for y in range(self.height):
+                color = self.image.getpixel((x, y))
+                if color == (255, 0, 0):
+                    red_pixels.append((x, y))
+        return red_pixels
+
+    def get_green_pixels(self):
+        green_pixels = []
+        for x in range(self.width):
+            for y in range(self.height):
+                color = self.image.getpixel((x, y))
+                if color == (0, 255, 0):
+                    green_pixels.append((x, y))
+        return green_pixels
+    
     def build_graph(self):
-        if self.image is not None:
-            for x in range(self.width):
-                for y in range(self.height):
-                    pixel = self.image.getpixel((x, y))
+        for x in range(self.width):
+            for y in range(self.height):
+                color = self.image.getpixel((x, y))
+                if color != (0, 0, 0):
+                    self.graph[(x, y)] = [(nx, ny) for nx, ny in [(x-1, y), (x+1, y), (x, y-1), (x, y+1)] 
+                                          if 0 <= nx < self.width and 0 <= ny < self.height and self.image.getpixel((nx, ny)) != (0, 0, 0)]
 
-                    if pixel == (255, 0, 0):  # Pixel vermelho (equipamento)
-                        self.equipment = (x, y)
-                    elif pixel == (0, 255, 0):  # Pixel verde (área de manutenção)
-                        self.maintenance_area = (x, y)
 
-                    if pixel != (0, 0, 0):  # Ignorar pixels pretos
-                        self.graph.add_node((x, y))
-
-                        for dx in [-1, 0, 1]:
-                            for dy in [-1, 0, 1]:
-                                nx_val = x + dx
-                                ny_val = y + dy
-
-                                if 0 <= nx_val < self.width and 0 <= ny_val < self.height:
-                                    neighbor_pixel = self.image.getpixel((nx_val, ny_val))
-
-                                    if neighbor_pixel != (0, 0, 0):
-                                        self.graph.add_edge((x, y), (nx_val, ny_val))
-
-    def find_path(self):
-        queue = deque([(self.equipment, [])])  # Inicializa fila com tupla contendo ponto atual e caminho percorrido
-        visited = set()
-        directions = {
-            (-1, 0): '↑', (1, 0): '↓', (0, -1): '←', (0, 1): '→'
-        }
-
+    def bfs(self, start, end):
+        queue = deque([[start]])
         while queue:
-            (current_point, path) = queue.popleft()
-            if current_point == self.maintenance_area:
-                return ' '.join(path)  # Retorna o caminho encontrado
-
-            if current_point not in visited:
-                visited.add(current_point)
-
-                for dx, dy in directions:
-                    nx_val = current_point[0] + dx
-                    ny_val = current_point[1] + dy
-
-                    if (nx_val, ny_val) in self.graph[current_point]:
-                        new_point = (nx_val, ny_val)
-                        new_path = path + [directions[(dx, dy)]]
-                        queue.append((new_point, new_path))
-
+            path = queue.popleft()
+            node = path[-1]
+            if node not in self.visited:
+                self.visited[node] = True
+                if node == end:
+                    return path
+                for adjacent in self.graph.get(node, []):
+                    new_path = list(path)
+                    new_path.append(adjacent)
+                    queue.append(new_path)
         return None
-
-def main():
-    caminho_imagem = 'toy.bmp'
-
-    image_graph = ImageGraph()
-    image_graph.process_image(caminho_imagem)
-    image_graph.build_graph()
-
-    path = image_graph.find_path()
-    if path:
-        print("Caminho encontrado:", path)
-    else:
-        print("Não foi possível encontrar um caminho")
-
-if __name__ == "__main__":
-    main()
+    
+    
+    def find_path(self):
+        red_pixels = self.get_red_pixels()
+        green_pixels = self.get_green_pixels()
+        for red_pixel in red_pixels:
+            for green_pixel in green_pixels:
+                path = self.bfs(red_pixel, green_pixel)
+                if path:
+                    return path
+        return None
+    
+image_graph = ImageGraph('toy.bmp')
+red_pixels = image_graph.get_red_pixels()
+green_pixels = image_graph.get_green_pixels()
+image_graph.build_graph()
+path = image_graph.find_path()
+print(path)
+image_graph.visualize_graph()
