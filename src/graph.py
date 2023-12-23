@@ -1,3 +1,7 @@
+#   Grupo:
+# Samuell Carlos de Oliveira Aguiar - 21.2.8025
+# Gustavo Gomes Rolim - 21.2.8031
+
 from collections import deque
 from PIL import Image
 from matplotlib import pyplot as plt
