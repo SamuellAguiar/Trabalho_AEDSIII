@@ -1,84 +1,103 @@
 from collections import deque
 from PIL import Image
 from matplotlib import pyplot as plt
-import networkx as nx
 
-class ImageGraph:
-    def __init__(self, image_path):
-        self.image = Image.open(image_path)
-        self.width, self.height = self.image.size
-        self.graph = {}
-        self.visited = {}
-        
 
-    def visualize_graph(self):
-        G = nx.Graph()
-        for node, edges in self.graph.items():
-            for edge in edges:
-                G.add_edge(node, edge)
+class GrafoImagem:
 
-        pos = {node: (node[0], -node[1]) for node in G.nodes()}  # Flip the y-axis to match image coordinates
-        nx.draw(G, pos, with_labels=False, node_size=10)
+    def __init__(self, caminho_imagem):
+
+        # Abre a imagem e obtem a largura e altura
+        self.imagem = Image.open(caminho_imagem)
+        self.largura, self.altura = self.imagem.size
+
+        # Inicializa o dicionário do grafo e o conjunto de visitados
+        self.grafo = {}
+        self.visitado = set()
+
+    def visualizar_grafo(self, caminho=None):
+
+        # Cria um gráfico para exibir a imagem
+        plt.figure(figsize=(8, 8))
+        plt.imshow(self.imagem)
+        plt.axis('off')
+
+        # Se um caminho foi encontrado, marca os nós do caminho no gráfico com quadrados azuis
+        if caminho:
+            for no in caminho:
+                x, y = no
+                plt.scatter(x, y, s=750, c='blue', marker='s')
         plt.show()
-    
 
-    def get_red_pixels(self):
-        red_pixels = []
-        for x in range(self.width):
-            for y in range(self.height):
-                color = self.image.getpixel((x, y))
-                if color == (255, 0, 0):
-                    red_pixels.append((x, y))
-        return red_pixels
+    def obter_pixels_por_cor(self, cor):
 
-    def get_green_pixels(self):
-        green_pixels = []
-        for x in range(self.width):
-            for y in range(self.height):
-                color = self.image.getpixel((x, y))
-                if color == (0, 255, 0):
-                    green_pixels.append((x, y))
-        return green_pixels
-    
-    def build_graph(self):
-        for x in range(self.width):
-            for y in range(self.height):
-                color = self.image.getpixel((x, y))
-                if color != (0, 0, 0):
-                    self.graph[(x, y)] = [(nx, ny) for nx, ny in [(x-1, y), (x+1, y), (x, y-1), (x, y+1)] 
-                                          if 0 <= nx < self.width and 0 <= ny < self.height and self.image.getpixel((nx, ny)) != (0, 0, 0)]
+        # Percorre todos os pixels da imagem para econtrar os pixels com a cor especificada
+        pixels = []
+        for x in range(self.largura):
+            for y in range(self.altura):
+                if self.imagem.getpixel((x, y)) == cor:
+                    pixels.append((x, y))
+        return pixels
 
+    def construir_grafo(self):
 
-    def bfs(self, start, end):
-        queue = deque([[start]])
-        while queue:
-            path = queue.popleft()
-            node = path[-1]
-            if node not in self.visited:
-                self.visited[node] = True
-                if node == end:
-                    return path
-                for adjacent in self.graph.get(node, []):
-                    new_path = list(path)
-                    new_path.append(adjacent)
-                    queue.append(new_path)
+        # Precorre todos os pixels para construir o grafo, considerando vizinhança de 4 vizinhos
+        for x in range(self.largura):
+            for y in range(self.altura):
+                cor = self.imagem.getpixel((x, y))
+
+                # Adiciona os pixels não pretos ao grafo com seus vizinhos não pretos
+                if cor != (0, 0, 0):
+                    self.grafo[(x, y)] = [(nx, ny) for nx, ny in [(x-1, y), (x+1, y), (x, y-1), (x, y+1)]
+                                          if 0 <= nx < self.largura and 0 <= ny < self.altura and self.imagem.getpixel((nx, ny)) != (0, 0, 0)]
+
+    def busca(self, inicio, fim):
+
+        # Algoritmo de Busca em Largura (BFS) para encontrar um caminho entre dois pontos
+        fila = deque([[inicio]])
+        while fila:
+            caminho = fila.popleft()
+            no = caminho[-1]
+
+            # Marca um nó como visitado
+            if no not in self.visitado:
+                self.visitado.add(no)
+
+                # Retorna o caminho se o nó de destino for alcançado
+                if no == fim:
+                    return caminho
+
+                # Adiciona os nós adjacentes à fila
+                for adjacente in self.grafo.get(no, []):
+                    novo_caminho = list(caminho)
+                    novo_caminho.append(adjacente)
+                    fila.append(novo_caminho)
         return None
-    
-    
-    def find_path(self):
-        red_pixels = self.get_red_pixels()
-        green_pixels = self.get_green_pixels()
-        for red_pixel in red_pixels:
-            for green_pixel in green_pixels:
-                path = self.bfs(red_pixel, green_pixel)
-                if path:
-                    return path
+
+    def encontrar_caminho(self):
+
+        # Encontra os pixels vermelhos e verdes na imgem
+        pixels_vermelhos = self.obter_pixels_por_cor((255, 0, 0))
+        pixels_verdes = self.obter_pixels_por_cor((0, 255, 0))
+
+        # Tenta encontrar um caminho entre pixels vermelhos e verdes
+        for pixel_vermelho in pixels_vermelhos:
+            for pixel_verde in pixels_verdes:
+                caminho = self.busca(pixel_vermelho, pixel_verde)
+                if caminho:
+                    return caminho
         return None
-    
-image_graph = ImageGraph('toy.bmp')
-red_pixels = image_graph.get_red_pixels()
-green_pixels = image_graph.get_green_pixels()
-image_graph.build_graph()
-path = image_graph.find_path()
-print(path)
-image_graph.visualize_graph()
+
+
+# Cria uma instância da classe GrafoImagem e encontra o caminho da imagem 'toy.bmp'
+grafo_imagem = GrafoImagem('toy.bmp')
+
+# Constrói o grafo baseado na imagem fornecida
+grafo_imagem.construir_grafo()
+
+# Encontra o caminho entre os pixels vermelho e verde na imagem
+caminho_encontrado = grafo_imagem.encontrar_caminho()
+
+# Imprime o caminho encontrado e visualiza o grafo representando o caminho na imagem
+print(caminho_encontrado)
+grafo_imagem.visualizar_grafo(caminho_encontrado)
