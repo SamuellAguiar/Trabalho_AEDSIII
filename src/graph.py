@@ -72,7 +72,10 @@ class GrafoImagem:
                     novo_caminho = list(caminho)
                     novo_caminho.append(adjacente)
                     fila.append(novo_caminho)
-        return None
+
+        # Retorna None se não houver caminho entre os nós de origem e destino
+                    
+        return print("Não há caminho entre os nós de origem e destino")
 
     def encontrar_caminho(self):
 
