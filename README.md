@@ -7,10 +7,10 @@
 <h4>Como Usar</h4>
 <ul>
   <li>Configuração de Ambiente:</li>
-      <li>Certifique-se de ter Python instalado (versão recomendada: Python 3.x).</li>
+     <p>Certifique-se de ter Python instalado (versão recomendada: Python 3.x).</p>
   <li>Execução:</li>
-      <li>Para executar o programa, utilize o arquivo graph.py presente na pasta src/.</li>
-      <li>Este arquivo é o ponto de entrada do projeto e contém toda a lógica necessária para processar a imagem e aplicar o algoritmo de busca em largura.</li>
+      <p>Para executar o programa, utilize o arquivo graph.py presente na pasta src/.</p>
+      <p>Este arquivo é o ponto de entrada do projeto e contém toda a lógica necessária para processar a imagem e aplicar o algoritmo de busca em largura.</p>
 </ul>
 <h4>Autores</h4>
 <p>
