@@ -8,7 +8,7 @@
 
 <p>
   Samuell Carlos de Oliveira Aguiar
-  Gustavo Gomes Rolim
+  <br/>Gustavo Gomes Rolim
 </p>
 
 <h4>Licença</h4>
