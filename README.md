@@ -16,8 +16,8 @@
 </ul>
 <h4>Autores</h4>
 <p>
-  <a href="https://github.com/SamuellAguiar">Samuell Carlos de Oliveira Aguiar</a>
-  <br/><a href="https://github.com/GustavoRolim1" >Gustavo Gomes Rolim</a>
+  <a href="https://github.com/SamuellAguiar" style="text-decoration:none;">Samuell Carlos de Oliveira Aguiar</a>
+  <br/><a href="https://github.com/GustavoRolim1" style="text-decoration:none;">Gustavo Gomes Rolim</a>
 </p>
 
 <h4>Licença</h4>
