@@ -4,7 +4,7 @@
   Este repositório contém o código-fonte e recursos necessários para o trabalho prático da disciplina de Algoritmos e Estruturas de Dados III. O projeto consiste na     aplicação do algoritmo de busca em largura (BFS - Breadth-First Search) para encontrar um caminho entre duas áreas distintas em um arquivo BMP, utilizando o arquivo graph.py em Python.
 </p>
 
-<h4>Como Usar</h4>
+<h4>Como Testar o Projeto</h4>
 <ul>
   <li>Configuração de Ambiente:</li>
   <br/>
@@ -14,6 +14,13 @@
       <p>Para executar o programa, utilize o arquivo graph.py presente na pasta src/.</p>
       <p>Este arquivo é o ponto de entrada do projeto e contém toda a lógica necessária para processar a imagem e aplicar o algoritmo de busca em largura.</p>
 </ul>
+
+<p>
+    Ao rodar o projeto abrirá um pop-up de seleção para que vc escolha os arquivos que sejam necessários fazer o teste desejado.
+    No trabalho era requirido os arquivos que estão no diretório /toyFloors e são testados todos os arquivos do diretório.</br>
+    Assim como acontece nas imagens abaixo:
+    ![alt text](C:\Users\samue\OneDrive\Área de Trabalho\Trabalho Prático\TP1_Aeds-III\Sem Titulo.png)
+</p>
 <h4>Autores</h4>
 <p>
   <a href="https://github.com/SamuellAguiar" style="text-decoration:none;">Samuell Carlos de Oliveira Aguiar</a>
