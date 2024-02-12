@@ -18,8 +18,6 @@
 <p>
     Ao rodar o projeto abrirá um pop-up de seleção para que vc escolha os arquivos que sejam necessários fazer o teste desejado.
     No trabalho era requirido os arquivos que estão no diretório /toyFloors e são testados todos os arquivos do diretório.</br>
-    Assim como acontece nas imagens abaixo:
-    ![alt text](C:\Users\samue\OneDrive\Área de Trabalho\Trabalho Prático\TP1_Aeds-III\Sem Titulo.png)
 </p>
 <h4>Autores</h4>
 <p>
