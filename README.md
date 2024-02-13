@@ -1,7 +1,7 @@
 <h2>Trabalho Prático de AEDS III</h2>
 
 <p>
-  Este repositório contém o código-fonte e recursos necessários para o trabalho prático da disciplina de Algoritmos e Estruturas de Dados III. O projeto consiste na     aplicação do algoritmo de busca em largura (BFS - Breadth-First Search) para encontrar um caminho entre duas áreas distintas em um arquivo BMP, utilizando o arquivo graph.py em Python.
+  Este repositório contém o código-fonte e recursos necessários para o trabalho prático da disciplina de Algoritmos e Estruturas de Dados III. O projeto consiste na     aplicação do algoritmo de Dijkstra para encontrar um caminho entre duas áreas distintas em arquivos *BMP, utilizando o arquivo graph.py em Python.
 </p>
 
 <h4>Como Testar o Projeto</h4>
