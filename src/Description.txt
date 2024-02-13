@@ -1,0 +1,10 @@
+Esse arquivo contém uma breve descrição de como funciona o arquivo.
+
+1º = Rode o arquivo através do arquivo graph.py
+
+2º = O arquivo irá solicitar a seleção dos arquivos por parte do usuário.
+
+3º = Após a seleção, o programa já começa a buscar e encontrar os caminhos das imagens (se houver o caminho).
+
+4º = Quando for o caso de ter mais de uma imagem, como é o caso da questão do trabalho, basta apenas fechar o pop-up da imagem atual 
+que o pop-up com o caminho da próxima imagem irá aparecer na tela.
